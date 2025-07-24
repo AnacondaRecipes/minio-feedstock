@@ -1,5 +1,5 @@
 {% set name = "minio" %}
-{% set version = "7.1.0" %}
+{% set version = "7.2.16" %}
 
 package:
   name: {{ name|lower }}
@@ -7,39 +7,42 @@ package:
 
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 90b853a48422240028d0720668808d2cc7498b5f843271b533ba6fa91e3e3797
+  sha256: 81e365c8494d591d8204a63ee7596bfdf8a7d06ad1b1507d6b9c1664a95f299a
 
 build:
-  noarch: python
   number: 0
-  script: {{ PYTHON }} -m pip install . --no-deps -vv
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  skip: True  # [py<39]
 
 requirements:
   host:
-    - python >=3.6
+    - python
     - pip
-    - setuptools
     - wheel
+    - setuptools
   run:
     - python
-    - future
-    - urllib3
-    - pytz
     - certifi
-    - python-dateutil
-    - configparser
+    - urllib3
+    - argon2-cffi
+    - pycryptodome
+    - typing-extensions
 
 test:
+  source_files:
+    - tests
   imports:
     - minio
     - minio.api
     - minio.helpers
     - minio.error
     - minio.sse
-  requires:
-    - pip
   commands:
     - pip check
+    - pytest -v tests
+  requires:
+    - pip
+    - pytest
 
 about:
   home: https://github.com/minio/minio-py
